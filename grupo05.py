@@ -1,5 +1,51 @@
+mayusculas = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+minusculas = 'abcdefghijklmnopqrstuvwxyz'
+LAMBDA = 0
+reservadas = ["lambda"]
 
 class Gramatica():
+
+    def GetFirsts(antec, consec, noTerminals):
+        Firsts = [None] *len(antec) 
+        LookingFor = []
+        n = 0
+        for var in antec:
+            #First para n elemento 
+            consecSplitted = consec[n].split(' ')
+            if(consecSplitted[0] in noTerminals):
+                Firsts[n] = [consecSplitted[0]]
+            else:
+                if(consecSplitted[0] == reservadas[LAMBDA]):
+                    Firsts[n] = [consecSplitted[0]]
+                else:
+                    Firsts[n] = []
+                    LookingFor.append([n, var ,consecSplitted[0], 0])
+            n+=1
+        print('FIRST TERMINALS')
+        print(Firsts)
+        print('----------------')
+
+        n = -1
+        for noTerminal in LookingFor:
+            n=n+1
+            if(noTerminal[1] in list(map(lambda x: x[1], LookingFor[n+1:]))):
+                LookingFor.append(noTerminal)
+                continue
+        
+                
+            for x in range(0, len(antec)):
+                if(antec[x] == noTerminal[2]):
+                    Firsts[noTerminal[0]] = list(set(Firsts[x])|set(Firsts[noTerminal[0]]))
+    
+                    if(reservadas[LAMBDA] in Firsts[x]):
+                        if(consec[n].split(' ')[noTerminal[3]] in noTerminals or consec[n].split(' ')[noTerminal[3]] == reservadas[LAMBDA]):
+                            if(consec[n].split(' ')[noTerminal[3]] not in Firsts[noTerminal[0]]):
+                                Firsts[noTerminal[0]].append(consec[n].split(' ')[noTerminal[3]])
+                        else:
+                            LookingFor.append([n, None,consec[n].split(' ')[noTerminal[3]], noTerminal[3]+1])
+
+
+        return Firsts
 
 
     def ConstruirReglas(gramatica,band):
@@ -46,71 +92,35 @@ class Gramatica():
 
 
         pass
-    def NoyT(antec,consec,band):
+    def NoyT(antecedentes,consecuentes,bandera):
         """  Noyt: Devuelve Lista de antecedentes y Consecuentes.
-
         True: Devuelve la lista de terminales
         False: Devuelve la lista de no terminales
-
         """
+        values = []
 
-        ListaNT=[]
-        ListaT=[]
-        mayusculas = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        minusculas = 'abcdefghijklmnopqrstuvwxyz'
-        reservadas = "lambda"
-        ListaPalabrasAux1 = []
-        ListaPalabrasAux2 = []
-        for i in range(0, len(antec)):
-            ListaPalabrasAux1.append(antec[i].split(" "))
-
-        for i in range(0, len(consec)):
-            ListaPalabrasAux2.append(consec[i].split(" "))
-
-        #Antecedentes
-        for j in range(0,len(ListaPalabrasAux1)):
-            palabra2= ListaPalabrasAux1[j]
-            for j2 in range(0,len(palabra2)):
-                aux1=palabra2[j2]
-                if aux1[0] in mayusculas:
-                    ListaNT.append(aux1)
-
-            palabra2 = ""
-            primletra=""
-
-        #Consecuentes
-
-        cadena=[]
-
-        for j in range(0,len(ListaPalabrasAux2)):
-            palabra2= ListaPalabrasAux2[j]
-            for j2 in range(0,len(palabra2)):
-                aux1=palabra2[j2]
-
-                if aux1[0] in mayusculas:
-                    ListaNT.append(aux1)
+        for antecedente in antecedentes:
+            antecedenteSplitted = antecedente.split(' ')
+            for terminalNoTerminal in antecedenteSplitted:
+                if(bandera):
+                    if (terminalNoTerminal in mayusculas and terminalNoTerminal not in values):
+                        values.append(terminalNoTerminal)
                 else:
-                    if ((aux1[0] in minusculas) or (aux1 == "lambda")):
-                        ListaT.append(aux1)
+                    if(terminalNoTerminal in minusculas and terminalNoTerminal not in values):
+                        values.append(terminalNoTerminal)
+         
+        
+        for consecuente in consecuentes:
+            consecuenteSplitted = consecuente.split(' ')
+            for terminalNoTerminal in consecuenteSplitted:
+                if(bandera):
+                    if (terminalNoTerminal in mayusculas and terminalNoTerminal not in values):
+                        values.append(terminalNoTerminal)
+                else:
+                    if((terminalNoTerminal in minusculas or terminalNoTerminal == reservadas[LAMBDA])and terminalNoTerminal not in values):
+                        values.append(terminalNoTerminal)
 
-            palabra2 = ""
-            primletra=""
-
-        terminales= set(ListaT)
-        noterminales=set(ListaNT)
-
-
-        #Bandera true retorno No terminales
-        #Bandera False retorno terminales
-
-
-        """print(ListaPalabrasAux1)"""
-
-        """print(ListaPalabrasAux2)"""
-        if (band==True):
-            return terminales
-        else:
-            return noterminales
+        return values
 
 
     def __init__(self,gramatica1):
@@ -128,8 +138,10 @@ class Gramatica():
         self.gramatica = gramatica1
         self.Antecedentes = Gramatica.ConstruirReglas(self.gramatica, True)
         self.Consecuentes = Gramatica.ConstruirReglas(self.gramatica, False)
-        self.NoTerminales = Gramatica.NoyT(self.Antecedentes, self.Consecuentes, True)
-        self.Terminales = Gramatica.NoyT(self.Antecedentes, self.Consecuentes, False)
+        self.Terminales = Gramatica.NoyT(self.Antecedentes, self.Consecuentes, True)
+        self.NoTerminales = Gramatica.NoyT(self.Antecedentes, self.Consecuentes, False)
+
+        self.Firsts = Gramatica.GetFirsts(self.Antecedentes, self.Consecuentes, self.NoTerminales)
 
 
     def isLL1(self):
@@ -171,10 +183,12 @@ class Gramatica():
         print("Consecuentes: ")
         print(self.Consecuentes)
         print("No terminales: ")
-        print(self.NoTerminales)
+        print(self.Terminales)
         print("Terminales: ")
-        print(self.Terminales
-              )
+        print(self.NoTerminales)
+        print("Firsts: ")
+        print(self.Firsts)
+              
 
         pass
 
