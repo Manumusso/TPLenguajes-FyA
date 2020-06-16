@@ -12,37 +12,35 @@ class Gramatica():
         for var in antec:
             #First para n elemento 
             consecSplitted = consec[n].split(' ')
-            if(consecSplitted[0] in noTerminals):
+            if(consecSplitted[0] in noTerminals or consecSplitted[0] == reservadas[LAMBDA]):
                 Firsts[n] = [consecSplitted[0]]
             else:
-                if(consecSplitted[0] == reservadas[LAMBDA]):
-                    Firsts[n] = [consecSplitted[0]]
-                else:
-                    Firsts[n] = []
-                    LookingFor.append([n, var ,consecSplitted[0], 0])
+                Firsts[n] = []
+                LookingFor.append([n, consecSplitted[0], 0])
             n+=1
-        print('FIRST TERMINALS')
-        print(Firsts)
-        print('----------------')
-
-        n = -1
+        
+        
         for noTerminal in LookingFor:
-            n=n+1
-            if(noTerminal[1] in list(map(lambda x: x[1], LookingFor[n+1:]))):
-                LookingFor.append(noTerminal)
-                continue
+          #  if(noTerminal[1] in list(map(lambda x: x[1], LookingFor[n+1:]))):
+          #      LookingFor.append(noTerminal)
+          #      continue
         
                 
             for x in range(0, len(antec)):
-                if(antec[x] == noTerminal[2]):
+                if(x == noTerminal[0]):
+                    continue
+
+                if(antec[x] == noTerminal[1]):
                     Firsts[noTerminal[0]] = list(set(Firsts[x])|set(Firsts[noTerminal[0]]))
     
                     if(reservadas[LAMBDA] in Firsts[x]):
-                        if(consec[n].split(' ')[noTerminal[3]] in noTerminals or consec[n].split(' ')[noTerminal[3]] == reservadas[LAMBDA]):
-                            if(consec[n].split(' ')[noTerminal[3]] not in Firsts[noTerminal[0]]):
-                                Firsts[noTerminal[0]].append(consec[n].split(' ')[noTerminal[3]])
-                        else:
-                            LookingFor.append([n, None,consec[n].split(' ')[noTerminal[3]], noTerminal[3]+1])
+                        consecSplitted = consec[noTerminal[0]].split(' ')
+                        if len(consecSplitted) > noTerminal[2] + 1:
+                            if(consecSplitted[noTerminal[2] + 1] in noTerminals or consecSplitted[noTerminal[2]] == reservadas[LAMBDA]):
+                                if(consecSplitted[noTerminal[2]] not in Firsts[noTerminal[0]]):
+                                    Firsts[noTerminal[0]].append(consecSplitted[noTerminal[2]])
+                            else:
+                                LookingFor.append([noTerminal[0], consecSplitted[noTerminal[2] + 1], noTerminal[2] + 1])
 
 
         return Firsts
