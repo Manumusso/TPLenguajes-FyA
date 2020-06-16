@@ -2,7 +2,7 @@ mayusculas = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 minusculas = 'abcdefghijklmnopqrstuvwxyz'
 LAMBDA = 0
 reservadas = ["lambda"]
-
+Listfolows=[]
 class Gramatica():
 
     def GetFirsts(antec, consec, noTerminals):
@@ -44,6 +44,55 @@ class Gramatica():
 
 
         return Firsts
+
+
+
+
+    def Search_Follows_Antecedent(Antecedentes,indiceRegla, indiceToken):
+        for ii in range(0 ,len(Antecedentes)):
+            if ii == indiceRegla:
+                for f in range(0, len(Listfollows)):
+                    if Listfollows[f] not in Listfollows:
+                        Listfollows.append(Listfolows[f])
+
+
+
+    def Calculate_Follows(antecedentes,noterminal,Consecuentes):
+
+        if (Gramatica.IsAxiom(antecedentes,noterminal) == True):
+            Listfolows.append('$')
+        Gramatica.Search_follows(Consecuentes,noterminal,antecedentes)
+
+        return Listfolows
+
+    def Search_follows(consec,nt,Antecedentes):
+        consecu = []
+        for i in range(0, len(consec)):
+            for k in range (0,len(consec[i])):
+                conseSplitted = consec[i].split(' ')
+            for j in range (0,len(conseSplitted)):
+                if (nt== conseSplitted[j]):
+                    tamanindice = len(conseSplitted)
+                    if (tamanindice-1) > j:
+                        NoTerminales = Gramatica.NoyT(Antecedentes, consec, True)
+                        Terminales = Gramatica.NoyT(Antecedentes, consec, False)
+                        if conseSplitted[j+1] in (NoTerminales):
+                            break
+                        else:
+                            if conseSplitted[j+1] in (Terminales):
+                                terminal = conseSplitted[j+1]
+                                if terminal not in Listfolows:
+                                    Listfolows.append(terminal)
+                    else:
+                        # Buscar folows del antecedente de la regla (Falta probar)
+                        Gramatica.Search_Follows_Antecedent(Antecedentes,i,j)
+
+    def IsAxiom(antec,noterminal):
+        for i in range(0, len(antec)):
+            if antec[i] == noterminal:
+                return True
+            else:
+                return False
 
 
     def ConstruirReglas(gramatica,band):
@@ -138,9 +187,9 @@ class Gramatica():
         self.Consecuentes = Gramatica.ConstruirReglas(self.gramatica, False)
         self.Terminales = Gramatica.NoyT(self.Antecedentes, self.Consecuentes, True)
         self.NoTerminales = Gramatica.NoyT(self.Antecedentes, self.Consecuentes, False)
-
         self.Firsts = Gramatica.GetFirsts(self.Antecedentes, self.Consecuentes, self.NoTerminales)
 
+        self.CalcularFolows = Gramatica.Calculate_Follows(Gramatica.ConstruirReglas(self.gramatica, True),"A",Gramatica.ConstruirReglas(self.gramatica, False))
 
     def isLL1(self):
         """Verifica si una gramática permite realizar derivaciones utilizando
@@ -186,7 +235,9 @@ class Gramatica():
         print(self.NoTerminales)
         print("Firsts: ")
         print(self.Firsts)
-              
+        print("Folows")
+        print(self.CalcularFolows)
+
 
         pass
 
@@ -199,7 +250,7 @@ A: lambda
 B: b
 
 """
-gramatica = "A:b A\nA:a\nA:A B c\nA:lambda\nB:b"
+gramatica = "A:b A a\nA:a\nA:A B c\nA:lambda\nB:b"
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
 
