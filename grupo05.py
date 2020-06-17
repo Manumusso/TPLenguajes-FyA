@@ -3,53 +3,57 @@ minusculas = 'abcdefghijklmnopqrstuvwxyz'
 LAMBDA = 0
 reservadas = ["lambda"]
 Listfolows=[]
+First=[]
 class Gramatica():
 
-    def GetFirsts(antec, consec, noTerminals):
-        Firsts = [None] *len(antec) 
+    def GetFirsts(self):
+        Firsts = [None] * len(self.Antecedentes)
         LookingFor = []
         n = 0
-        for var in antec:
-            #First para n elemento 
-            consecSplitted = consec[n].split(' ')
-            if(consecSplitted[0] in noTerminals or consecSplitted[0] == reservadas[LAMBDA]):
+        for var in self.Antecedentes:
+            # First para n elemento
+            consecSplitted = self.Consecuentes[n].split(' ')
+            if (consecSplitted[0] in self.Terminales or consecSplitted[0] == reservadas[LAMBDA]):
                 Firsts[n] = [consecSplitted[0]]
             else:
                 Firsts[n] = []
                 LookingFor.append([n, consecSplitted[0], 0])
-            n+=1
-        
-        
+            n += 1
+
         for noTerminal in LookingFor:
-          #  if(noTerminal[1] in list(map(lambda x: x[1], LookingFor[n+1:]))):
-          #      LookingFor.append(noTerminal)
-          #      continue
-        
-                
-            for x in range(0, len(antec)):
-                if(x == noTerminal[0]):
+            #  if(noTerminal[1] in list(map(lambda x: x[1], LookingFor[n+1:]))):
+            #      LookingFor.append(noTerminal)
+            #      continue
+
+            for x in range(0, len(self.Antecedentes)):
+                if (x == noTerminal[0]):
                     continue
 
-                if(antec[x] == noTerminal[1]):
-                    Firsts[noTerminal[0]] = list(set(Firsts[x])|set(Firsts[noTerminal[0]]))
-    
-                    if(reservadas[LAMBDA] in Firsts[x]):
-                        consecSplitted = consec[noTerminal[0]].split(' ')
+                if (self.Antecedentes[x] == noTerminal[1]):
+                    Firsts[noTerminal[0]] = list(set(Firsts[x]) | set(Firsts[noTerminal[0]]))
+
+                    if (reservadas[LAMBDA] in Firsts[x]):
+                        consecSplitted = self.Consecuentes[noTerminal[0]].split(' ')
                         if len(consecSplitted) > noTerminal[2] + 1:
-                            if(consecSplitted[noTerminal[2] + 1] in noTerminals or consecSplitted[noTerminal[2]] == reservadas[LAMBDA]):
-                                if(consecSplitted[noTerminal[2]] not in Firsts[noTerminal[0]]):
+                            if (consecSplitted[noTerminal[2] + 1] in self.Terminales or consecSplitted[
+                                noTerminal[2]] == reservadas[LAMBDA]):
+                                if (consecSplitted[noTerminal[2]] not in Firsts[noTerminal[0]]):
                                     Firsts[noTerminal[0]].append(consecSplitted[noTerminal[2]])
                             else:
                                 LookingFor.append([noTerminal[0], consecSplitted[noTerminal[2] + 1], noTerminal[2] + 1])
 
-
         return Firsts
 
+    def GetFirstByLetter(self,letra):
+        firstsLetra = []
+        for index in range(0, len(self.Antecedentes)):
+            if (letra == self.Antecedentes[index]):
+                    firstsLetra = list(set(self.Firsts[index])|set(firstsLetra))
+        return firstsLetra
 
 
-
-    def Search_Follows_Antecedent(Antecedentes,indiceRegla):
-        for ii in range(0 ,len(Antecedentes)):
+    def Search_Follows_Antecedent(self,indiceRegla):
+        for ii in range(0 ,len(self.Antecedentes)):
             if Antecedentes[ii] == indiceRegla:
                 for rl in range(0, len(Listfollows)):
                     ## En este momento agrego los folows de la regla en que me encuentro posicionado a la lista
@@ -58,26 +62,26 @@ class Gramatica():
 
 
 
-    def Calculate_Follows(antecedentes,noterminal,Consecuentes):
+    def Calculate_Follows(self,nt):
 
-        if (Gramatica.IsAxiom(antecedentes,noterminal) == True):
+        if (Gramatica.IsAxiom(self.Antecedentes,nt) == True):
             Listfolows.append('$')
-        Gramatica.Search_follows(Consecuentes,noterminal,antecedentes)
+        Gramatica.Search_follows(self,nt)
 
         return Listfolows
 
 
-    def recurfollows(Antecedentes,r,tamindice,reglaindice,consecuentes,ListSplitted):
+    def recurfollows(self,r,tamindice,reglaindice,ListSplitted):
         FirstSi= []
         r=r+1
         band =False
+
         if (tamindice - 1) > r:
-            NoTerminales = Gramatica.NoyT(Antecedentes, consecuentes, True)
-            Terminales = Gramatica.NoyT(Antecedentes, consecuentes, False)
+            NoTerminales = Gramatica.NoyT(self, True)
+            Terminales = Gramatica.NoyT(self, False)
             if ListSplitted[r+1] in (NoTerminales):
                 band = False
-                # FirstSi = Gramatica.GetFirsts(Antecedentes,consec,conseSplitted[j+1])
-                FirstSi=["d","lambda"]
+                FirstSi = Gramatica.GetFirsts(self,conseSplitted[j+1])
                 for aux in range(0, len(FirstSi)):
                     if ((FirstSi[aux] not in reservadas) and (FirstSi[aux] not in Listfolows)):
                         Listfolows.append(FirstSi[aux])
@@ -87,7 +91,7 @@ class Gramatica():
                 if band:
                     a2 = r
                     a2 += 1
-                    Gramatica.recurfollows(Antecedentes, a2, tamindice, reglaindice, consecuentes, ListSplitted)
+                    Gramatica.recurfollows(self, a2, tamindice, reglaindice, ListSplitted)
             else:
                 if ListSplitted[r+1] in (Terminales):
                     terminal = conseSplitted[a2+1]
@@ -97,24 +101,22 @@ class Gramatica():
             # Buscar folows del antecedente de la regla (Falta probar)
             Gramatica.Search_Follows_Antecedent(Antecedentes, reglaindice)
 
-    def Search_follows(consec,nt,Antecedentes):
+
+    def Search_follows(self,nt):
         consecu = []
         FirstSi = []
 
-        for i in range(0, len(consec)):
-            for k in range (0,len(consec[i])):
-                conseSplitted = consec[i].split(' ')
+        for i in range(0, len(self.Consecuentes)):
+            for k in range (0,len(self.Consecuentes[i])):
+                conseSplitted = self.Consecuentes[i].split(' ')
             for j in range (0,len(conseSplitted)):
                 if (nt== conseSplitted[j]):
                     tamanindice = len(conseSplitted)
                     if (tamanindice-1) > j:
-                        NoTerminales = Gramatica.NoyT(Antecedentes, consec, True)
-                        Terminales = Gramatica.NoyT(Antecedentes, consec, False)
-
-                        if conseSplitted[j+1] in (NoTerminales):
+                        if conseSplitted[j+1] in (self.NoTerminales):
                             band = False
-                            #FirstSi = Gramatica.GetFirsts(Antecedentes,consec,conseSplitted[j+1])
-                            FirstSi = ["b","lambda","c"]
+                            FirstSi = Gramatica.GetFirstByLetter(self,conseSplitted[j+1])
+
                             for aux in range(0, len(FirstSi)):
                                 if ((FirstSi[aux] not in reservadas) and (FirstSi[aux] not in Listfolows)):
                                         Listfolows.append(FirstSi[aux])
@@ -125,25 +127,26 @@ class Gramatica():
                                 global r
                                 r=j
                                 r+=1
-                                Gramatica.recurfollows(Antecedentes,r,tamanindice,i,consec,conseSplitted)
+                                Gramatica.recurfollows(self,r,tamanindice,i,conseSplitted)
                         else:
-                            if conseSplitted[j+1] in (Terminales):
+                            if conseSplitted[j+1] in (self.Terminales):
                                 terminal = conseSplitted[j+1]
                                 if terminal not in Listfolows:
                                     Listfolows.append(terminal)
                     else:
                         # Buscar folows del antecedente de la regla (Falta probar)
-                        Gramatica.Search_Follows_Antecedent(Antecedentes,i)
+                        Gramatica.Search_Follows_Antecedent(self,i)
 
-    def IsAxiom(antec,noterminal):
-        for i in range(0, len(antec)):
-            if antec[i] == noterminal:
+    def IsAxiom(self,nt):
+
+        for i in range(0, len(self)):
+            if (self[i] == nt):
                 return True
             else:
                 return False
 
 
-    def ConstruirReglas(gramatica,band):
+    def ConstruirReglas(self,band):
         """
         Construir Reglas: Devuelve Lista de antecedentes y Consecuentes.
 
@@ -153,7 +156,7 @@ class Gramatica():
 
         """
         separador1 = "\n"
-        Lista1 = gramatica.split(separador1)
+        Lista1 = self.gramatica.split(separador1)
         ListaReglas = []
         LineaAntecedentes= []
         LineaConsecuentes= []
@@ -171,7 +174,7 @@ class Gramatica():
                 LineaAntecedentes.append(List[0])
                 LineaConsecuentes.append(List[1])
                 distin == 1
-              
+
             else:
                 LineaAntecedentes.append(List[i])
                 LineaConsecuentes.append(List[i+1])
@@ -182,19 +185,15 @@ class Gramatica():
         else:
             return LineaConsecuentes
 
-
-
-
-
         pass
-    def NoyT(antecedentes,consecuentes,bandera):
+    def NoyT(self,bandera):
         """  Noyt: Devuelve Lista de antecedentes y Consecuentes.
         True: Devuelve la lista de terminales
         False: Devuelve la lista de no terminales
         """
         values = []
 
-        for antecedente in antecedentes:
+        for antecedente in self.Antecedentes:
             antecedenteSplitted = antecedente.split(' ')
             for terminalNoTerminal in antecedenteSplitted:
                 if(bandera):
@@ -205,7 +204,7 @@ class Gramatica():
                         values.append(terminalNoTerminal)
          
         
-        for consecuente in consecuentes:
+        for consecuente in self.Consecuentes:
             consecuenteSplitted = consecuente.split(' ')
             for terminalNoTerminal in consecuenteSplitted:
                 if(bandera):
@@ -218,7 +217,7 @@ class Gramatica():
         return values
 
 
-    def __init__(self,gramatica1):
+    def __init__(self,gramatica):
         """Constructor de la clase.
 
         Parameters
@@ -230,14 +229,14 @@ class Gramatica():
             "A:b A\nA:a\nA:A B c\nA:lambda\nB:b"
 
         """
-        self.gramatica = gramatica1
-        self.Antecedentes = Gramatica.ConstruirReglas(self.gramatica, True)
-        self.Consecuentes = Gramatica.ConstruirReglas(self.gramatica, False)
-        self.Terminales = Gramatica.NoyT(self.Antecedentes, self.Consecuentes, True)
-        self.NoTerminales = Gramatica.NoyT(self.Antecedentes, self.Consecuentes, False)
-        self.Firsts = Gramatica.GetFirsts(self.Antecedentes, self.Consecuentes, self.NoTerminales)
+        self.gramatica = gramatica
+        self.Antecedentes = Gramatica.ConstruirReglas(self, True)
+        self.Consecuentes = Gramatica.ConstruirReglas(self, False)
+        self.Terminales = Gramatica.NoyT(self,False)
+        self.NoTerminales = Gramatica.NoyT(self, True)
+        self.Firsts = Gramatica.GetFirsts(self)
 
-        self.CalcularFolows = Gramatica.Calculate_Follows(Gramatica.ConstruirReglas(self.gramatica, True),"A",Gramatica.ConstruirReglas(self.gramatica, False))
+        self.CalcularFolows = Gramatica.Calculate_Follows(self,"A")
 
     def isLL1(self):
         """Verifica si una gramática permite realizar derivaciones utilizando
@@ -278,9 +277,9 @@ class Gramatica():
         print("Consecuentes: ")
         print(self.Consecuentes)
         print("No terminales: ")
-        print(self.Terminales)
-        print("Terminales: ")
         print(self.NoTerminales)
+        print("Terminales: ")
+        print(self.Terminales)
         print("Firsts: ")
         print(self.Firsts)
         print("Folows")
@@ -298,7 +297,7 @@ A: lambda
 B: b
 
 """
-gramatica = "A:b\nA:a\nA:A B c\nA:lambda\nB:b\nB:lambda\nC:z"
+gramatica = "A:b\nA:a\nA:A B c\nA:lambda\nB:b"
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
 
