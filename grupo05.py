@@ -48,12 +48,13 @@ class Gramatica():
 
 
 
-    def Search_Follows_Antecedent(Antecedentes,indiceRegla, indiceToken):
+    def Search_Follows_Antecedent(Antecedentes,indiceRegla):
         for ii in range(0 ,len(Antecedentes)):
-            if ii == indiceRegla:
-                for f in range(0, len(Listfollows)):
-                    if Listfollows[f] not in Listfollows:
-                        Listfollows.append(Listfolows[f])
+            if Antecedentes[ii] == indiceRegla:
+                for rl in range(0, len(Listfollows)):
+                    ## En este momento agrego los folows de la regla en que me encuentro posicionado a la lista
+                    if Listfollows[rl] not in Listfollows:
+                        Listfollows.append(Listfolows[rl])
 
 
 
@@ -65,8 +66,41 @@ class Gramatica():
 
         return Listfolows
 
+
+    def recurfollows(Antecedentes,r,tamindice,reglaindice,consecuentes,ListSplitted):
+        FirstSi= []
+        r=r+1
+        band =False
+        if (tamindice - 1) > r:
+            NoTerminales = Gramatica.NoyT(Antecedentes, consecuentes, True)
+            Terminales = Gramatica.NoyT(Antecedentes, consecuentes, False)
+            if ListSplitted[r+1] in (NoTerminales):
+                band = False
+                # FirstSi = Gramatica.GetFirsts(Antecedentes,consec,conseSplitted[j+1])
+                FirstSi=["d","lambda"]
+                for aux in range(0, len(FirstSi)):
+                    if ((FirstSi[aux] not in reservadas) and (FirstSi[aux] not in Listfolows)):
+                        Listfolows.append(FirstSi[aux])
+                    else:
+                        if (FirstSi[aux] == "lambda"):
+                            band = True
+                if band:
+                    a2 = r
+                    a2 += 1
+                    Gramatica.recurfollows(Antecedentes, a2, tamindice, reglaindice, consecuentes, ListSplitted)
+            else:
+                if ListSplitted[r+1] in (Terminales):
+                    terminal = conseSplitted[a2+1]
+                    if terminal not in Listfolows:
+                        Listfolows.append(terminal)
+        else:
+            # Buscar folows del antecedente de la regla (Falta probar)
+            Gramatica.Search_Follows_Antecedent(Antecedentes, reglaindice)
+
     def Search_follows(consec,nt,Antecedentes):
         consecu = []
+        FirstSi = []
+
         for i in range(0, len(consec)):
             for k in range (0,len(consec[i])):
                 conseSplitted = consec[i].split(' ')
@@ -76,8 +110,22 @@ class Gramatica():
                     if (tamanindice-1) > j:
                         NoTerminales = Gramatica.NoyT(Antecedentes, consec, True)
                         Terminales = Gramatica.NoyT(Antecedentes, consec, False)
+
                         if conseSplitted[j+1] in (NoTerminales):
-                            break
+                            band = False
+                            #FirstSi = Gramatica.GetFirsts(Antecedentes,consec,conseSplitted[j+1])
+                            FirstSi = ["b","lambda","c"]
+                            for aux in range(0, len(FirstSi)):
+                                if ((FirstSi[aux] not in reservadas) and (FirstSi[aux] not in Listfolows)):
+                                        Listfolows.append(FirstSi[aux])
+                                else:
+                                    if (FirstSi[aux]== "lambda"):
+                                        band = True
+                            if band:
+                                global r
+                                r=j
+                                r+=1
+                                Gramatica.recurfollows(Antecedentes,r,tamanindice,i,consec,conseSplitted)
                         else:
                             if conseSplitted[j+1] in (Terminales):
                                 terminal = conseSplitted[j+1]
@@ -85,7 +133,7 @@ class Gramatica():
                                     Listfolows.append(terminal)
                     else:
                         # Buscar folows del antecedente de la regla (Falta probar)
-                        Gramatica.Search_Follows_Antecedent(Antecedentes,i,j)
+                        Gramatica.Search_Follows_Antecedent(Antecedentes,i)
 
     def IsAxiom(antec,noterminal):
         for i in range(0, len(antec)):
@@ -123,7 +171,7 @@ class Gramatica():
                 LineaAntecedentes.append(List[0])
                 LineaConsecuentes.append(List[1])
                 distin == 1
-                i=i+2
+              
             else:
                 LineaAntecedentes.append(List[i])
                 LineaConsecuentes.append(List[i+1])
@@ -250,7 +298,7 @@ A: lambda
 B: b
 
 """
-gramatica = "A:b A a\nA:a\nA:A B c\nA:lambda\nB:b"
+gramatica = "A:b\nA:a\nA:A B c\nA:lambda\nB:b\nB:lambda\nC:z"
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
 
