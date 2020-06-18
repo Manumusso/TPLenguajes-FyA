@@ -54,7 +54,7 @@ class Gramatica():
 
     def Search_Follows_Antecedent(self,indiceRegla):
         for ii in range(0 ,len(self.Antecedentes)):
-            if Antecedentes[ii] == indiceRegla:
+            if ii == indiceRegla:
                 for rl in range(0, len(Listfollows)):
                     ## En este momento agrego los folows de la regla en que me encuentro posicionado a la lista
                     if Listfollows[rl] not in Listfollows:
@@ -236,7 +236,7 @@ class Gramatica():
         self.NoTerminales = Gramatica.NoyT(self, True)
         self.Firsts = Gramatica.GetFirsts(self)
 
-        self.CalcularFolows = Gramatica.Calculate_Follows(self,"A")
+        self.CalcularFolows = Gramatica.Calculate_Follows(self,"X")
 
     def isLL1(self):
         """Verifica si una gramática permite realizar derivaciones utilizando
@@ -297,7 +297,7 @@ A: lambda
 B: b
 
 """
-gramatica = "A:b\nA:a\nA:A B c\nA:lambda\nB:b"
+gramatica = "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
 
