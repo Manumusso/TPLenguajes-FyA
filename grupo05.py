@@ -20,11 +20,22 @@ class Gramatica():
                 Firsts[n] = []
                 LookingFor.append([n, consecSplitted[0], 0])
             n += 1
-        for noTerminal in LookingFor:
+        
+        maxNoTerminal = len(LookingFor)
+        index = 0
+        while index < maxNoTerminal:
+            noTerminal = LookingFor[index]
+            
+            if(noTerminal[1] in list(map(lambda x: self.Antecedentes[x],list(map(lambda x: x[0], LookingFor[index+1:]))))):
+                LookingFor.append(noTerminal)
+                maxNoTerminal = len(LookingFor)
+                index+=1
+                continue
+
             for x in range(0, len(self.Antecedentes)):
                 if (x == noTerminal[0]):
                     continue
-
+                    x+=1                
                 if (self.Antecedentes[x] == noTerminal[1]):
                     Firsts[noTerminal[0]] = list(set(Firsts[x]) | set(Firsts[noTerminal[0]]))
                     if (reservadas[LAMBDA] in Firsts[x]):
@@ -40,7 +51,9 @@ class Gramatica():
                             print(Firsts)
                             if(reservadas[LAMBDA] in Firsts[noTerminal[0]]):
                                 Firsts[noTerminal[0]].remove(reservadas[LAMBDA])
-
+            
+            maxNoTerminal = len(LookingFor)
+            index+=1
         return Firsts
 
     def GetFirstByLetter(self,letra):
@@ -66,13 +79,11 @@ class Gramatica():
             consSplitted = self.Consecuentes[index].split(" ")
             if(terminalsDicc.get(self.Antecedentes[index]) is not None):
                 if(consSplitted[0] in terminalsDicc[self.Antecedentes[index]]):
-                    print(terminalsDicc)
                     return True
                 else:
                     terminalsDicc[self.Antecedentes[index]].append(consSplitted[0])
             else:
                 terminalsDicc[self.Antecedentes[index]] = [consSplitted[0]]
-        print(terminalsDicc)
         return False
 
 
@@ -324,6 +335,8 @@ class Gramatica():
 
         pass
 
+
+
 # Pruebas:
 """
 A:b A   
@@ -334,9 +347,9 @@ B: b
 
 """
 
-gramatica= "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
+#gramatica= "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
 #gramatica = "S:A\nA:B A\nA:lambda\nB:a B\nB:b"
-#gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
+gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
 
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
