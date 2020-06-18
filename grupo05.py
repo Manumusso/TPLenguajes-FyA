@@ -66,20 +66,26 @@ class Gramatica():
                 terminalsDicc[self.Antecedentes[index]] = [consSplitted[0]]
         print(terminalsDicc)
         return False
-    def Search_Follows_Antecedent(self,indiceRegla):
+    def Search_Follows_Antecedent(self,indiceRegla,Listfolows,indicons):
+        Lfolows = []
+        conseSplitted=[]
+        Letrafolows = self.Antecedentes[indiceRegla]
+        for i2 in range(0, len(self.Consecuentes)):
+            for k in range (0,len(self.Consecuentes[i2])):
+                conseSplitted = self.Consecuentes[i2].split(' ')
+            for j in range(0, len(conseSplitted)):
+                if (i2 == indiceRegla) and (j == indicons):
+                    LetraLook = conseSplitted[j]
         for ii in range(0 ,len(self.Antecedentes)):
-            if ii == indiceRegla:
-                for rl in range(0, len(Listfollows)):
-                    ## En este momento agrego los folows de la regla en que me encuentro posicionado a la lista
-                    if Listfollows[rl] not in Listfollows:
-                        Listfollows.append(Listfolows[rl])
+            if (ii == indiceRegla) and (Letrafolows != LetraLook):
+                    Gramatica.Search_follows(self, Letrafolows)
+
+
 
 
 
     def Calculate_Follows(self,nt):
 
-        if (Gramatica.IsAxiom(self.Antecedentes,nt) == True):
-            Listfolows.append('$')
         Gramatica.Search_follows(self,nt)
 
         return Listfolows
@@ -113,12 +119,14 @@ class Gramatica():
                         Listfolows.append(terminal)
         else:
             # Buscar folows del antecedente de la regla (Falta probar)
-            Gramatica.Search_Follows_Antecedent(Antecedentes, reglaindice)
+            Gramatica.Search_Follows_Antecedent(Antecedentes, reglaindice,Listfolows,r)
 
 
     def Search_follows(self,nt):
         consecu = []
         FirstSi = []
+        if ((Gramatica.IsAxiom(self,nt)) == True):
+            Listfolows.append('$')
 
         for i in range(0, len(self.Consecuentes)):
             for k in range (0,len(self.Consecuentes[i])):
@@ -149,15 +157,13 @@ class Gramatica():
                                     Listfolows.append(terminal)
                     else:
                         # Buscar folows del antecedente de la regla (Falta probar)
-                        Gramatica.Search_Follows_Antecedent(self,i)
+                        Gramatica.Search_Follows_Antecedent(self,i,Listfolows,j)
 
     def IsAxiom(self,nt):
-
-        for i in range(0, len(self)):
-            if (self[i] == nt):
-                return True
-            else:
-                return False
+        if self.Antecedentes[0] == nt:
+            return True
+        else:
+            return False
 
 
     def ConstruirReglas(self,band):
@@ -250,7 +256,7 @@ class Gramatica():
         self.NoTerminales = Gramatica.NoyT(self, True)
         self.Firsts = Gramatica.GetFirsts(self)
 
-        #self.CalcularFolows = Gramatica.Calculate_Follows(self,"X")
+        self.CalcularFolows = Gramatica.Calculate_Follows(self,"S")
 
     def isLL1(self):
         """Verifica si una gramática permite realizar derivaciones utilizando
@@ -297,7 +303,7 @@ class Gramatica():
         print("Firsts: ")
         print(self.Firsts)
         print("Folows")
-        #print(self.CalcularFolows)
+        print(self.CalcularFolows)
         print("Tiene Factor Comun")
         print(Gramatica.HasCommonFactor(self))
 
@@ -313,7 +319,7 @@ A: lambda
 B: b
 
 """
-gramatica = "X:X Y\nX:e\nX:e\nX:lambda\nY:a\nY:d"
+gramatica = "S:A B\nA: a A\nA:c\nA:lambda\nB:b B\nB:d"
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
 
