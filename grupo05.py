@@ -19,19 +19,13 @@ class Gramatica():
                 Firsts[n] = []
                 LookingFor.append([n, consecSplitted[0], 0])
             n += 1
-
         for noTerminal in LookingFor:
-            #  if(noTerminal[1] in list(map(lambda x: x[1], LookingFor[n+1:]))):
-            #      LookingFor.append(noTerminal)
-            #      continue
-
             for x in range(0, len(self.Antecedentes)):
                 if (x == noTerminal[0]):
                     continue
 
                 if (self.Antecedentes[x] == noTerminal[1]):
                     Firsts[noTerminal[0]] = list(set(Firsts[x]) | set(Firsts[noTerminal[0]]))
-
                     if (reservadas[LAMBDA] in Firsts[x]):
                         consecSplitted = self.Consecuentes[noTerminal[0]].split(' ')
                         if len(consecSplitted) > noTerminal[2] + 1:
@@ -41,6 +35,10 @@ class Gramatica():
                                     Firsts[noTerminal[0]].append(consecSplitted[noTerminal[2]])
                             else:
                                 LookingFor.append([noTerminal[0], consecSplitted[noTerminal[2] + 1], noTerminal[2] + 1])
+                            print(noTerminal[0])
+                            print(Firsts)
+                            if(reservadas[LAMBDA] in Firsts[noTerminal[0]]):
+                                Firsts[noTerminal[0]].remove(reservadas[LAMBDA])
 
         return Firsts
 
@@ -51,7 +49,23 @@ class Gramatica():
                     firstsLetra = list(set(self.Firsts[index])|set(firstsLetra))
         return firstsLetra
 
+    def HasRecursivity(self):
+        pass
 
+    def HasCommonFactor(self):
+        terminalsDicc = {}
+        for index in range(len(self.Antecedentes)):
+            consSplitted = self.Consecuentes[index].split(" ")
+            if(terminalsDicc.get(self.Antecedentes[index]) is not None):
+                if(consSplitted[0] in terminalsDicc[self.Antecedentes[index]]):
+                    print(terminalsDicc)
+                    return True
+                else:
+                    terminalsDicc[self.Antecedentes[index]].append(consSplitted[0])
+            else:
+                terminalsDicc[self.Antecedentes[index]] = [consSplitted[0]]
+        print(terminalsDicc)
+        return False
     def Search_Follows_Antecedent(self,indiceRegla):
         for ii in range(0 ,len(self.Antecedentes)):
             if ii == indiceRegla:
@@ -236,7 +250,7 @@ class Gramatica():
         self.NoTerminales = Gramatica.NoyT(self, True)
         self.Firsts = Gramatica.GetFirsts(self)
 
-        self.CalcularFolows = Gramatica.Calculate_Follows(self,"X")
+        #self.CalcularFolows = Gramatica.Calculate_Follows(self,"X")
 
     def isLL1(self):
         """Verifica si una gramática permite realizar derivaciones utilizando
@@ -283,7 +297,9 @@ class Gramatica():
         print("Firsts: ")
         print(self.Firsts)
         print("Folows")
-        print(self.CalcularFolows)
+        #print(self.CalcularFolows)
+        print("Tiene Factor Comun")
+        print(Gramatica.HasCommonFactor(self))
 
 
         pass
@@ -297,7 +313,7 @@ A: lambda
 B: b
 
 """
-gramatica = "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
+gramatica = "X:X Y\nX:e\nX:e\nX:lambda\nY:a\nY:d"
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
 
