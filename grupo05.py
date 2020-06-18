@@ -6,6 +6,7 @@ Listfolows=[]
 First=[]
 class Gramatica():
 
+# Methodos para calcular first
     def GetFirsts(self):
         Firsts = [None] * len(self.Antecedentes)
         LookingFor = []
@@ -49,8 +50,15 @@ class Gramatica():
                     firstsLetra = list(set(self.Firsts[index])|set(firstsLetra))
         return firstsLetra
 
+
+# Recursividad y Factor Comun
     def HasRecursivity(self):
-        pass
+        for index in range(len(self.Antecedentes)):
+            consSplitted = self.Consecuentes[index].split(" ")                        
+            if(consSplitted[0] == self.Antecedentes[index]):
+                return True
+
+        return False
 
     def HasCommonFactor(self):
         terminalsDicc = {}
@@ -66,6 +74,9 @@ class Gramatica():
                 terminalsDicc[self.Antecedentes[index]] = [consSplitted[0]]
         print(terminalsDicc)
         return False
+
+
+# Follows
     def Search_Follows_Antecedent(self,indiceRegla,Listfolows,indicons):
         Lfolows = []
         conseSplitted=[]
@@ -78,16 +89,11 @@ class Gramatica():
                     Gramatica.Search_follows(self, Letrafolows)
             break
 
-
-
-
-
     def Calculate_Follows(self,nt):
 
         Gramatica.Search_follows(self,nt)
 
         return Listfolows
-
 
     def recurfollows(self,r,tamindice,reglaindice,ListSplitted):
         FirstSi= []
@@ -118,7 +124,6 @@ class Gramatica():
         else:
             # Buscar folows del antecedente de la regla (Falta probar)
             Gramatica.Search_Follows_Antecedent(self, reglaindice,Listfolows,r)
-
 
     def Search_follows(self,nt):
         consecu = []
@@ -157,12 +162,21 @@ class Gramatica():
                         # Buscar folows del antecedente de la regla (Falta probar)
                         Gramatica.Search_Follows_Antecedent(self,i,Listfolows,j)
 
+    def CalcularFollows(self):
+        ListaCompletaFolows= [None] * len(self.NoTerminales)
+        noterminals = self.NoTerminales
+        for id in range(0,len(noterminals)):
+            ListaCompletaFolows[id] = Gramatica.Calculate_Follows(self,noterminals[id]).copy()
+            Listfolows.clear()
+
+        return ListaCompletaFolows
+
+
     def IsAxiom(self,nt):
         if self.Antecedentes[0] == nt:
             return True
         else:
             return False
-
 
     def ConstruirReglas(self,band):
         """
@@ -204,6 +218,7 @@ class Gramatica():
             return LineaConsecuentes
 
         pass
+
     def NoyT(self,bandera):
         """  Noyt: Devuelve Lista de antecedentes y Consecuentes.
         True: Devuelve la lista de terminales
@@ -234,16 +249,6 @@ class Gramatica():
 
         return values
 
-    def CalcularFollows(self):
-        ListaCompletaFolows= [None] * len(self.NoTerminales)
-        noterminals = self.NoTerminales
-        for id in range(0,len(noterminals)):
-            ListaCompletaFolows[id] = Gramatica.Calculate_Follows(self,noterminals[id]).copy()
-            Listfolows.clear()
-
-        return ListaCompletaFolows
-
-
     def __init__(self,gramatica):
         """Constructor de la clase.
 
@@ -263,7 +268,6 @@ class Gramatica():
         self.NoTerminales = Gramatica.NoyT(self, True)
         self.Firsts = Gramatica.GetFirsts(self)
         self.CalcularFollows= Gramatica.CalcularFollows(self)
-
 
     def isLL1(self):
         """Verifica si una gramática permite realizar derivaciones utilizando
@@ -296,6 +300,7 @@ class Gramatica():
             utilizando la gramática.
         """
         pass
+    
     def ImprimirPrueba(self):
         print("Gramatica: ")
         print(self.gramatica)
@@ -313,6 +318,8 @@ class Gramatica():
         print(self.CalcularFollows)
         print("Tiene Factor Comun")
         print(Gramatica.HasCommonFactor(self))
+        print("Tiene Recursividad")
+        print(Gramatica.HasRecursivity(self))
 
 
         pass
