@@ -74,11 +74,9 @@ class Gramatica():
             for k in range (0,len(self.Consecuentes[i2])):
                 conseSplitted = self.Consecuentes[i2].split(' ')
             for j in range(0, len(conseSplitted)):
-                if (i2 == indiceRegla) and (j == indicons):
-                    LetraLook = conseSplitted[j]
-        for ii in range(0 ,len(self.Antecedentes)):
-            if (ii == indiceRegla) and (Letrafolows != LetraLook):
+                if (i2 == indiceRegla):
                     Gramatica.Search_follows(self, Letrafolows)
+            break
 
 
 
@@ -119,13 +117,13 @@ class Gramatica():
                         Listfolows.append(terminal)
         else:
             # Buscar folows del antecedente de la regla (Falta probar)
-            Gramatica.Search_Follows_Antecedent(Antecedentes, reglaindice,Listfolows,r)
+            Gramatica.Search_Follows_Antecedent(self, reglaindice,Listfolows,r)
 
 
     def Search_follows(self,nt):
         consecu = []
         FirstSi = []
-        if ((Gramatica.IsAxiom(self,nt)) == True):
+        if ((Gramatica.IsAxiom(self,nt)) == True) and (('$') not in Listfolows):
             Listfolows.append('$')
 
         for i in range(0, len(self.Consecuentes)):
@@ -236,6 +234,15 @@ class Gramatica():
 
         return values
 
+    def CalcularFollows(self):
+        ListaCompletaFolows= [None] * len(self.NoTerminales)
+        noterminals = self.NoTerminales
+        for id in range(0,len(noterminals)):
+            ListaCompletaFolows[id] = Gramatica.Calculate_Follows(self,noterminals[id]).copy()
+            Listfolows.clear()
+
+        return ListaCompletaFolows
+
 
     def __init__(self,gramatica):
         """Constructor de la clase.
@@ -255,8 +262,8 @@ class Gramatica():
         self.Terminales = Gramatica.NoyT(self,False)
         self.NoTerminales = Gramatica.NoyT(self, True)
         self.Firsts = Gramatica.GetFirsts(self)
+        self.CalcularFollows= Gramatica.CalcularFollows(self)
 
-        self.CalcularFolows = Gramatica.Calculate_Follows(self,"S")
 
     def isLL1(self):
         """Verifica si una gramática permite realizar derivaciones utilizando
@@ -303,7 +310,7 @@ class Gramatica():
         print("Firsts: ")
         print(self.Firsts)
         print("Folows")
-        print(self.CalcularFolows)
+        print(self.CalcularFollows)
         print("Tiene Factor Comun")
         print(Gramatica.HasCommonFactor(self))
 
@@ -319,7 +326,11 @@ A: lambda
 B: b
 
 """
-gramatica = "S:A B\nA: a A\nA:c\nA:lambda\nB:b B\nB:d"
+
+gramatica= "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
+#gramatica = "S:A\nA:B A\nA:lambda\nB:a B\nB:b"
+#gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
+
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
 
