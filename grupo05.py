@@ -6,7 +6,7 @@ Listfolows=[]
 First=[]
 class Gramatica():
 
-# Methodos para calcular first
+# Metodos para calcular first
     def GetFirsts(self):
         Firsts = [None] * len(self.Antecedentes)
         LookingFor = []
@@ -47,8 +47,6 @@ class Gramatica():
                                     Firsts[noTerminal[0]].append(consecSplitted[noTerminal[2]])
                             else:
                                 LookingFor.append([noTerminal[0], consecSplitted[noTerminal[2] + 1], noTerminal[2] + 1])
-                            print(noTerminal[0])
-                            print(Firsts)
                             if(reservadas[LAMBDA] in Firsts[noTerminal[0]]):
                                 Firsts[noTerminal[0]].remove(reservadas[LAMBDA])
             
@@ -62,6 +60,16 @@ class Gramatica():
             if (letra == self.Antecedentes[index]):
                     firstsLetra = list(set(self.Firsts[index])|set(firstsLetra))
         return firstsLetra
+
+# Metodos para calcular Selects
+    def GetSelects(self):
+        Selects = [None] * len(self.Antecedentes)
+        for index in range(len(self.Antecedentes)):
+            Selects[index] = self.Firsts[index].copy()
+            if(reservadas[LAMBDA] in Selects[index]):
+                Selects[index].remove(reservadas[LAMBDA])
+                Selects[index] = list(set(Selects[index]).union(set(self.Folows.get(self.Antecedentes[index]))))
+        return Selects
 
 
 # Recursividad y Factor Comun
@@ -174,13 +182,13 @@ class Gramatica():
                         Gramatica.Search_Follows_Antecedent(self,i,Listfolows,j)
 
     def CalcularFollows(self):
-        ListaCompletaFolows= [None] * len(self.NoTerminales)
+        dicFollows = {}
         noterminals = self.NoTerminales
         for id in range(0,len(noterminals)):
-            ListaCompletaFolows[id] = Gramatica.Calculate_Follows(self,noterminals[id]).copy()
-            Listfolows.clear()
+            dicFollows[noterminals[id]] = Gramatica.Calculate_Follows(self,noterminals[id]).copy()
+            Listfolows.clear() #Limpiamos la lista de follows general.
 
-        return ListaCompletaFolows
+        return dicFollows
 
 
     def IsAxiom(self,nt):
@@ -278,7 +286,8 @@ class Gramatica():
         self.Terminales = Gramatica.NoyT(self,False)
         self.NoTerminales = Gramatica.NoyT(self, True)
         self.Firsts = Gramatica.GetFirsts(self)
-        self.CalcularFollows= Gramatica.CalcularFollows(self)
+        self.Folows= Gramatica.CalcularFollows(self)
+        self.Selects= Gramatica.GetSelects(self)
 
     def isLL1(self):
         """Verifica si una gramática permite realizar derivaciones utilizando
@@ -326,7 +335,9 @@ class Gramatica():
         print("Firsts: ")
         print(self.Firsts)
         print("Folows")
-        print(self.CalcularFollows)
+        print(self.Folows)
+        print("Selects")
+        print(self.Selects)
         print("Tiene Factor Comun")
         print(Gramatica.HasCommonFactor(self))
         print("Tiene Recursividad")
@@ -348,8 +359,8 @@ B: b
 """
 
 #gramatica= "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
-#gramatica = "S:A\nA:B A\nA:lambda\nB:a B\nB:b"
-gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
+gramatica = "S:A\nA:B A\nA:lambda\nB:a B\nB:b"
+#gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
 
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
