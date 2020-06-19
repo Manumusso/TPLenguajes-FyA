@@ -61,6 +61,7 @@ class Gramatica():
                     firstsLetra = list(set(self.Firsts[index])|set(firstsLetra))
         return firstsLetra
 
+
 # Metodos para calcular Selects
     def GetSelects(self):
         Selects = [None] * len(self.Antecedentes)
@@ -298,6 +299,19 @@ class Gramatica():
         resultado : bool
             Indica si la gramática es o no LL1.
         """
+
+        dicc = {}
+        for index in range(0, len(self.Antecedentes)):
+            if (dicc.get(self.Antecedentes[index]) is not None):
+                    for element in self.Selects[index]:
+                        if(element in dicc[[self.Antecedentes[index]]]):
+                            return false
+                    dicc[self.Antecedentes[index]] = list(set(dicc[self.Antecedentes[index]]).union(set(Selects[index])))
+            else:
+                dicc[self.Antecedentes[index]] = Selects[index]
+
+        return True
+
         pass
 
     def parse(self, cadena):
@@ -358,8 +372,8 @@ B: b
 
 """
 
-#gramatica= "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
-gramatica = "S:A\nA:B A\nA:lambda\nB:a B\nB:b"
+gramatica= "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
+#gramatica = "S:A\nA:B A\nA:lambda\nB:a B\nB:b"
 #gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
 
 prueba = Gramatica(gramatica)
