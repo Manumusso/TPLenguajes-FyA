@@ -4,6 +4,7 @@ LAMBDA = 0
 reservadas = ["lambda"]
 Listfolows=[]
 First=[]
+#import corrector
 class Gramatica():
 
 # Metodos para calcular first
@@ -239,6 +240,9 @@ class Gramatica():
 
         pass
 
+#--Terminales y NT
+#-Terminales  False
+#-No Terminales True
     def NoyT(self,bandera):
         """  Noyt: Devuelve Lista de antecedentes y Consecuentes.
         True: Devuelve la lista de terminales
@@ -289,6 +293,7 @@ class Gramatica():
         self.Firsts = Gramatica.GetFirsts(self)
         self.Folows= Gramatica.CalcularFollows(self)
         self.Selects= Gramatica.GetSelects(self)
+        self.isLL1 = Gramatica.isLL1(self)
 
     def isLL1(self):
         """Verifica si una gramática permite realizar derivaciones utilizando
@@ -299,20 +304,23 @@ class Gramatica():
         resultado : bool
             Indica si la gramática es o no LL1.
         """
-
+        #if (Gramatica.HasRecursivity(self)):
+         #   return False
+        #if Gramatica.HasCommonFactor(self):
+         #   return False
         dicc = {}
         for index in range(0, len(self.Antecedentes)):
-            if (dicc.get(self.Antecedentes[index]) is not None):
+            if dicc.get(self.Antecedentes[index]) is not None:
                     for element in self.Selects[index]:
-                        if(element in dicc[[self.Antecedentes[index]]]):
-                            return false
-                    dicc[self.Antecedentes[index]] = list(set(dicc[self.Antecedentes[index]]).union(set(Selects[index])))
+                        if(element in dicc[self.Antecedentes[index]]) and (dicc.keys() == self.Antecedentes[index]):
+                            return False
+                    dicc[self.Antecedentes[index]] = list(set(dicc[self.Antecedentes[index]]).union(set(self.Selects[index])))
             else:
-                dicc[self.Antecedentes[index]] = Selects[index]
+                dicc[self.Antecedentes[index]] = self.Selects[index]
 
         return True
 
-        pass
+
 
     def parse(self, cadena):
         """Retorna la derivación para una cadena dada utilizando las
@@ -357,6 +365,8 @@ class Gramatica():
         print("Tiene Recursividad")
         print(Gramatica.HasRecursivity(self))
 
+        print("Es LL1:")
+        print(Gramatica.isLL1(self))
 
         pass
 
