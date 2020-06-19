@@ -4,6 +4,8 @@ LAMBDA = 0
 reservadas = ["lambda"]
 Listfolows=[]
 First=[]
+
+
 #import corrector
 class Gramatica():
 
@@ -143,6 +145,13 @@ class Gramatica():
                     if terminal not in Listfolows:
                         Listfolows.append(terminal)
         else:
+            Bandauxiliar = False
+            FirstAux = self.GetFirstByLetter(self.Consecuentes[reglaindice][r])
+            for j1 in range(0, len(FirstAux)):
+                if  (FirstAux[j1] == reservadas[LAMBDA]):
+                    Bandauxiliar = True
+            if (Bandauxiliar) and ("$") not in Listfolows:
+                Listfolows.append("$")
             # Buscar folows del antecedente de la regla (Falta probar)
             Gramatica.Search_Follows_Antecedent(self, reglaindice,Listfolows,r)
 
@@ -273,6 +282,9 @@ class Gramatica():
 
         return values
 
+
+
+
     def __init__(self,gramatica):
         """Constructor de la clase.
 
@@ -341,6 +353,7 @@ class Gramatica():
             Representación de las reglas a aplicar para derivar la cadena
             utilizando la gramática.
         """
+
         pass
     
     def ImprimirPrueba(self):
@@ -367,6 +380,7 @@ class Gramatica():
 
         print("Es LL1:")
         print(Gramatica.isLL1(self))
+
 
         pass
 
