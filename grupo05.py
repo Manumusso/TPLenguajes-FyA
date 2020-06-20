@@ -248,6 +248,8 @@ class Gramatica():
             return LineaConsecuentes
 
         pass
+    
+
 
 #--Terminales y NT
 #-Terminales  False
@@ -353,9 +355,44 @@ class Gramatica():
             Representación de las reglas a aplicar para derivar la cadena
             utilizando la gramática.
         """
+        stringListed = list(cadena.strip())
+        steps = list()
+        steps.append(self.Antecedentes[0])
+        rangeStr = len(stringListed)
+        for pos in range(rangeStr):
+            #Buscar regla
+            input = stringListed[0]
+            
+            nextNoTerminal =""
+            stepSplitted = steps[len(steps)-1].split(' ')
+            stepSplitted = list(filter(Gramatica.isNoTerminal, stepSplitted))
+            if len(stepSplitted) > 0:
+                nextNoTerminal = stepSplitted[0]
+            else:
+                if(input == '$'):
+                    return "=>".join(steps)
+                else:
+                    return "=>".join([])
 
+            isASelect = False
+            for index in range(len(self.Antecedentes)):
+                if(self.Antecedentes[index] == nextNoTerminal):
+                    if(input in self.Selects[index]):
+                        isASelect = True
+                        steps.append(steps[len(steps)-1].replace(nextNoTerminal,self.Consecuentes[index],1))
+                        if(input == self.Consecuentes[index].split(' ')[0]):
+                            stringListed.pop(0)
+                        break
+            
+            if(not isASelect):
+                return "=>".join([])
+
+        return "=>".join(steps)
         pass
-    
+
+    def isNoTerminal(value):
+        return value in mayusculas
+
     def ImprimirPrueba(self):
         print("Gramatica: ")
         print(self.gramatica)
@@ -377,11 +414,12 @@ class Gramatica():
         print(Gramatica.HasCommonFactor(self))
         print("Tiene Recursividad")
         print(Gramatica.HasRecursivity(self))
-
+                
         print("Es LL1:")
         print(Gramatica.isLL1(self))
 
-
+        print("-------------------")
+        print(Gramatica.parse(self, "aacd$"))
         pass
 
 
@@ -396,10 +434,12 @@ B: b
 
 """
 
-gramatica= "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
+#gramatica= "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
 #gramatica = "S:A\nA:B A\nA:lambda\nB:a B\nB:b"
 #gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
+gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
 
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
+
 
