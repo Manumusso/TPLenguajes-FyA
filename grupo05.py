@@ -285,7 +285,24 @@ class Gramatica():
         return values
 
 
+    def IsCalculate(self):
+        IsCalculate = False
+        ListaAux = []
 
+        for i in range(0, len(self.Consecuentes)):
+            for k in range(0, len(self.Consecuentes[i])):
+                conseSplit = self.Consecuentes[i].split(' ')
+            for index in range(0, len(conseSplit)):
+                if (conseSplit[index] in self.NoTerminales):
+                    for indexa in range(0, len(self.Antecedentes)):
+                        if (conseSplit[index] == self.Antecedentes[indexa]) and (conseSplit[index] not in ListaAux):
+                            ListaAux.append(conseSplit[index])
+        if self.Antecedentes[0] not in ListaAux:
+            ListaAux.append(self.Antecedentes[0])
+        if len(ListaAux) == len(self.NoTerminales):
+            IsCalculate = True
+
+        return IsCalculate
 
     def __init__(self,gramatica):
         """Constructor de la clase.
@@ -302,37 +319,42 @@ class Gramatica():
         self.gramatica = gramatica
         self.Antecedentes = Gramatica.ConstruirReglas(self, True)
         self.Consecuentes = Gramatica.ConstruirReglas(self, False)
-        self.Terminales = Gramatica.NoyT(self,False)
+        self.Terminales = Gramatica.NoyT(self, False)
         self.NoTerminales = Gramatica.NoyT(self, True)
-        self.Firsts = Gramatica.GetFirsts(self)
-        self.Folows= Gramatica.CalcularFollows(self)
-        self.Selects= Gramatica.GetSelects(self)
+
+        self.IsCalculate = Gramatica.IsCalculate(self)
+        if self.IsCalculate:
+            self.Firsts = Gramatica.GetFirsts(self)
+            self.Folows = Gramatica.CalcularFollows(self)
+            self.Selects = Gramatica.GetSelects(self)
         self.isLL1 = Gramatica.isLL1(self)
 
+
     def isLL1(self):
-        """Verifica si una gramática permite realizar derivaciones utilizando
-           la técnica LL1.
+            """Verifica si una gramática permite realizar derivaciones utilizando
+               la técnica LL1.
 
-        Returns
-        -------
-        resultado : bool
-            Indica si la gramática es o no LL1.
-        """
-        #if (Gramatica.HasRecursivity(self)):
-         #   return False
-        #if Gramatica.HasCommonFactor(self):
-         #   return False
-        dicc = {}
-        for index in range(0, len(self.Antecedentes)):
-            if dicc.get(self.Antecedentes[index]) is not None:
-                    for element in self.Selects[index]:
-                        if(element in dicc[self.Antecedentes[index]]) and (dicc.keys() == self.Antecedentes[index]):
-                            return False
-                    dicc[self.Antecedentes[index]] = list(set(dicc[self.Antecedentes[index]]).union(set(self.Selects[index])))
-            else:
-                dicc[self.Antecedentes[index]] = self.Selects[index]
+            Returns
+            -------
+            resultado : bool
+                Indica si la gramática es o no LL1.
+            """
+            if (Gramatica.HasRecursivity(self)):
+                return False
+            if Gramatica.HasCommonFactor(self):
+                return False
+            if self.IsCalculate:
+                dicc = {}
+                for index in range(0, len(self.Antecedentes)):
+                    if dicc.get(self.Antecedentes[index]) is not None:
+                            for element in self.Selects[index]:
+                                if(element in dicc[self.Antecedentes[index]]) and (dicc.keys() == self.Antecedentes[index]):
+                                    return False
+                            dicc[self.Antecedentes[index]] = list(set(dicc[self.Antecedentes[index]]).union(set(self.Selects[index])))
+                    else:
+                        dicc[self.Antecedentes[index]] = self.Selects[index]
 
-        return True
+            return True
 
 
 
@@ -405,18 +427,21 @@ class Gramatica():
         print("Terminales: ")
         print(self.Terminales)
         print("Firsts: ")
-        print(self.Firsts)
+        #print(self.Firsts)
         print("Folows")
-        print(self.Folows)
+        #print(self.Folows)
         print("Selects")
-        print(self.Selects)
+        #print(self.Selects)
         print("Tiene Factor Comun")
         print(Gramatica.HasCommonFactor(self))
         print("Tiene Recursividad")
         print(Gramatica.HasRecursivity(self))
-                
+
+
         print("Es LL1:")
         print(Gramatica.isLL1(self))
+
+
 
         print("-------------------")
         print(Gramatica.parse(self, "aacd$"))
@@ -434,10 +459,10 @@ B: b
 
 """
 
-#gramatica= "X:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
-#gramatica = "S:A\nA:B A\nA:lambda\nB:a B\nB:b"
+#gramatica = "S:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
+#gramatica ="S:A\nA:B A\nA:lambda\nB:a B\nB:b"
 #gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
-gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
+gramatica = "S:S C w c\nS:S D\nS:S E\nS:F\nS:G\nS:H"
 
 prueba = Gramatica(gramatica)
 prueba.ImprimirPrueba()
