@@ -383,13 +383,15 @@ class Gramatica():
         steps = list()
         steps.append(self.Antecedentes[0])
         rangeStr = len(stringListed)
-        for pos in range(rangeStr):
+        band = True
+        while band:
             #Buscar regla
             input = stringListed[0]
 
             nextNoTerminal =""
             stepSplitted = steps[len(steps)-1].split(' ')
             stepSplitted = list(filter(Gramatica.isNoTerminal, stepSplitted))
+
             if len(stepSplitted) > 0:
                 nextNoTerminal = stepSplitted[0]
             else:
@@ -397,6 +399,7 @@ class Gramatica():
                     return "=>".join(steps)
                 else:
                     return "=>".join([])
+
 
             isASelect = False
             for index in range(len(self.Antecedentes)):
