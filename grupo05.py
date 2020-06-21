@@ -4,9 +4,8 @@ LAMBDA = 0
 reservadas = ["lambda"]
 Listfolows=[]
 First=[]
+import corrector
 
-
-#import corrector
 class Gramatica():
 
 # Metodos para calcular first
@@ -23,12 +22,12 @@ class Gramatica():
                 Firsts[n] = []
                 LookingFor.append([n, consecSplitted[0], 0])
             n += 1
-        
+
         maxNoTerminal = len(LookingFor)
         index = 0
         while index < maxNoTerminal:
             noTerminal = LookingFor[index]
-            
+
             if(noTerminal[1] in list(map(lambda x: self.Antecedentes[x],list(map(lambda x: x[0], LookingFor[index+1:]))))):
                 LookingFor.append(noTerminal)
                 maxNoTerminal = len(LookingFor)
@@ -38,7 +37,7 @@ class Gramatica():
             for x in range(0, len(self.Antecedentes)):
                 if (x == noTerminal[0]):
                     continue
-                    x+=1                
+                    x+=1
                 if (self.Antecedentes[x] == noTerminal[1]):
                     Firsts[noTerminal[0]] = list(set(Firsts[x]) | set(Firsts[noTerminal[0]]))
                     if (reservadas[LAMBDA] in Firsts[x]):
@@ -52,7 +51,7 @@ class Gramatica():
                                 LookingFor.append([noTerminal[0], consecSplitted[noTerminal[2] + 1], noTerminal[2] + 1])
                             if(reservadas[LAMBDA] in Firsts[noTerminal[0]]):
                                 Firsts[noTerminal[0]].remove(reservadas[LAMBDA])
-            
+
             maxNoTerminal = len(LookingFor)
             index+=1
         return Firsts
@@ -79,7 +78,7 @@ class Gramatica():
 # Recursividad y Factor Comun
     def HasRecursivity(self):
         for index in range(len(self.Antecedentes)):
-            consSplitted = self.Consecuentes[index].split(" ")                        
+            consSplitted = self.Consecuentes[index].split(" ")
             if(consSplitted[0] == self.Antecedentes[index]):
                 return True
 
@@ -248,7 +247,7 @@ class Gramatica():
             return LineaConsecuentes
 
         pass
-    
+
 
 
 #--Terminales y NT
@@ -270,8 +269,8 @@ class Gramatica():
                 else:
                     if(terminalNoTerminal in minusculas and terminalNoTerminal not in values):
                         values.append(terminalNoTerminal)
-         
-        
+
+
         for consecuente in self.Consecuentes:
             consecuenteSplitted = consecuente.split(' ')
             for terminalNoTerminal in consecuenteSplitted:
@@ -327,7 +326,8 @@ class Gramatica():
             self.Firsts = Gramatica.GetFirsts(self)
             self.Folows = Gramatica.CalcularFollows(self)
             self.Selects = Gramatica.GetSelects(self)
-        self.isLL1 = Gramatica.isLL1(self)
+
+
 
 
     def isLL1(self):
@@ -339,6 +339,7 @@ class Gramatica():
             resultado : bool
                 Indica si la gramática es o no LL1.
             """
+
             if (Gramatica.HasRecursivity(self)):
                 return False
             if Gramatica.HasCommonFactor(self):
@@ -358,7 +359,7 @@ class Gramatica():
 
 
 
-    def parse(self, cadena):
+    def parse(self,cadena):
         """Retorna la derivación para una cadena dada utilizando las
            producciones de la gramática y los conjuntos de Fi, Fo y Se
            obtenidos previamente.
@@ -377,14 +378,15 @@ class Gramatica():
             Representación de las reglas a aplicar para derivar la cadena
             utilizando la gramática.
         """
-        stringListed = list(cadena.strip())
+        cadenav = cadena.split(' ')
+        stringListed = list(cadenav)
         steps = list()
         steps.append(self.Antecedentes[0])
         rangeStr = len(stringListed)
         for pos in range(rangeStr):
             #Buscar regla
             input = stringListed[0]
-            
+
             nextNoTerminal =""
             stepSplitted = steps[len(steps)-1].split(' ')
             stepSplitted = list(filter(Gramatica.isNoTerminal, stepSplitted))
@@ -405,12 +407,11 @@ class Gramatica():
                         if(input == self.Consecuentes[index].split(' ')[0]):
                             stringListed.pop(0)
                         break
-            
+
             if(not isASelect):
                 return "=>".join([])
-
         return "=>".join(steps)
-        pass
+
 
     def isNoTerminal(value):
         return value in mayusculas
@@ -444,8 +445,8 @@ class Gramatica():
 
 
         print("-------------------")
-        print(Gramatica.parse(self, "aacd$"))
-        pass
+        print(Gramatica.parse(self, "a a c d $"))
+
 
 
 
@@ -462,9 +463,8 @@ B: b
 #gramatica = "S:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
 #gramatica ="S:A\nA:B A\nA:lambda\nB:a B\nB:b"
 #gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
-gramatica = "S:S C w c\nS:S D\nS:S E\nS:F\nS:G\nS:H"
+#gramatica = "S:S C w c\nS:S D\nS:S E\nS:F\nS:G\nS:H"
 
-prueba = Gramatica(gramatica)
-prueba.ImprimirPrueba()
-
+#prueba = Gramatica(gramatica)
+#prueba.ImprimirPrueba()
 

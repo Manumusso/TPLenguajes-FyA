@@ -1,5 +1,3 @@
-
-
 import os
 import sys
 import importlib
@@ -10,10 +8,10 @@ module_file = [f.split('.')[0] for f in files if 'grupo' in f][0]
 grupo = importlib.import_module(module_file)
 
 grammars = [
-    ['S:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d', True, ('b d $', 'S=>X Y=>b Y=>b d')],
-    ['S:A\nA: B A\nA:lambda\nB:a B\nb', True, ('a a a b $', 'S=>A=>A B=>B=>a B=>a a B=>a a a B=>a a a b')],
-    ['S:A B\nA: a A\nA:c\nA:lambda\nB:b B\nB:d', True, ('a a c d $', 'S=>A B=>a A B=>a a A B=>a a c B=>a a c d')],
-    ['S:S C w c\nS:S D\nS:S E\nS:F\nS:F\nS:H', False, None]
+    #['S:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d', True, ('b d $', 'S=>X Y=>b Y=>b d')],
+    ['S:A\nA:B A\nA:lambda\nB:a B\nB:b', True, ('a a a b $', 'S=>A=>B A=>a B A=>a a B A=>a a a B A=>a a a b A=>a a a b')],
+    #['S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d', True, ('a a c d $', 'S=>A B=>a A B=>a a A B=>a a c B=>a a c d')],
+    #['S:S C w c\nS:S D\nS:S E\nS:F\nS:G\nS:H', False, None]
 ]
 
 for ix, grammar in enumerate(grammars):
