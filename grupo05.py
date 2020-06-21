@@ -322,6 +322,7 @@ class Gramatica():
         self.NoTerminales = Gramatica.NoyT(self, True)
 
         self.IsCalculate = Gramatica.IsCalculate(self)
+
         if self.IsCalculate:
             self.Firsts = Gramatica.GetFirsts(self)
             self.Folows = Gramatica.CalcularFollows(self)
@@ -354,7 +355,9 @@ class Gramatica():
                             dicc[self.Antecedentes[index]] = list(set(dicc[self.Antecedentes[index]]).union(set(self.Selects[index])))
                     else:
                         dicc[self.Antecedentes[index]] = self.Selects[index]
-
+            else:
+                return False
+                
             return True
 
 
@@ -383,8 +386,8 @@ class Gramatica():
         steps = list()
         steps.append(self.Antecedentes[0])
         rangeStr = len(stringListed)
-        band = True
-        while band:
+
+        while True:
             #Buscar regla
             input = stringListed[0]
 
@@ -396,6 +399,8 @@ class Gramatica():
                 nextNoTerminal = stepSplitted[0]
             else:
                 if(input == '$'):
+                    if(reservadas[LAMBDA] in steps[len(steps)-1].split(" ")):
+                         steps[len(steps)-1] = steps[len(steps)-1].replace(" " + reservadas[LAMBDA],"")
                     return "=>".join(steps)
                 else:
                     return "=>".join([])
@@ -418,56 +423,3 @@ class Gramatica():
 
     def isNoTerminal(value):
         return value in mayusculas
-
-    def ImprimirPrueba(self):
-        print("Gramatica: ")
-        print(self.gramatica)
-        print("Antecedentes: ")
-        print(self.Antecedentes)
-        print("Consecuentes: ")
-        print(self.Consecuentes)
-        print("No terminales: ")
-        print(self.NoTerminales)
-        print("Terminales: ")
-        print(self.Terminales)
-        print("Firsts: ")
-        #print(self.Firsts)
-        print("Folows")
-        #print(self.Folows)
-        print("Selects")
-        #print(self.Selects)
-        print("Tiene Factor Comun")
-        print(Gramatica.HasCommonFactor(self))
-        print("Tiene Recursividad")
-        print(Gramatica.HasRecursivity(self))
-
-
-        print("Es LL1:")
-        print(Gramatica.isLL1(self))
-
-
-
-        print("-------------------")
-        print(Gramatica.parse(self, "a a c d $"))
-
-
-
-
-# Pruebas:
-"""
-A:b A   
-A:a
-A:A B c
-A: lambda
-B: b
-
-"""
-
-#gramatica = "S:X Y\nX:e\nX:b\nX:lambda\nY:a\nY:d"
-#gramatica ="S:A\nA:B A\nA:lambda\nB:a B\nB:b"
-#gramatica = "S:A B\nA:a A\nA:c\nA:lambda\nB:b B\nB:d"
-#gramatica = "S:S C w c\nS:S D\nS:S E\nS:F\nS:G\nS:H"
-
-#prueba = Gramatica(gramatica)
-#prueba.ImprimirPrueba()
-
