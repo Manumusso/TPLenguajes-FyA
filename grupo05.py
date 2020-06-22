@@ -14,7 +14,6 @@ class Gramatica():
         LookingFor = []
         n = 0
         for var in self.Antecedentes:
-            # First para n elemento
             consecSplitted = self.Consecuentes[n].split(' ')
             if (consecSplitted[0] in self.Terminales or consecSplitted[0] == reservadas[LAMBDA]):
                 Firsts[n] = [consecSplitted[0]]
@@ -151,7 +150,6 @@ class Gramatica():
                     Bandauxiliar = True
             if (Bandauxiliar) and ("$") not in Listfolows:
                 Listfolows.append("$")
-            # Buscar folows del antecedente de la regla (Falta probar)
             Gramatica.Search_Follows_Antecedent(self, reglaindice,Listfolows,r)
 
     def Search_follows(self,nt):
@@ -188,7 +186,6 @@ class Gramatica():
                                 if terminal not in Listfolows:
                                     Listfolows.append(terminal)
                     else:
-                        # Buscar folows del antecedente de la regla (Falta probar)
                         Gramatica.Search_Follows_Antecedent(self,i,Listfolows,j)
 
     def CalcularFollows(self):
@@ -250,9 +247,6 @@ class Gramatica():
 
 
 
-#--Terminales y NT
-#-Terminales  False
-#-No Terminales True
     def NoyT(self,bandera):
         """  Noyt: Devuelve Lista de antecedentes y Consecuentes.
         True: Devuelve la lista de terminales
@@ -263,7 +257,7 @@ class Gramatica():
         for antecedente in self.Antecedentes:
             antecedenteSplitted = antecedente.split(' ')
             for terminalNoTerminal in antecedenteSplitted:
-                if(bandera):
+                if(not bandera):
                     if (terminalNoTerminal in mayusculas and terminalNoTerminal not in values):
                         values.append(terminalNoTerminal)
                 else:
@@ -274,7 +268,7 @@ class Gramatica():
         for consecuente in self.Consecuentes:
             consecuenteSplitted = consecuente.split(' ')
             for terminalNoTerminal in consecuenteSplitted:
-                if(bandera):
+                if(not bandera):
                     if (terminalNoTerminal in mayusculas and terminalNoTerminal not in values):
                         values.append(terminalNoTerminal)
                 else:
@@ -318,8 +312,8 @@ class Gramatica():
         self.gramatica = gramatica
         self.Antecedentes = Gramatica.ConstruirReglas(self, True)
         self.Consecuentes = Gramatica.ConstruirReglas(self, False)
-        self.Terminales = Gramatica.NoyT(self, False)
-        self.NoTerminales = Gramatica.NoyT(self, True)
+        self.Terminales = Gramatica.NoyT(self,  True)
+        self.NoTerminales = Gramatica.NoyT(self, False)
 
         self.IsCalculate = Gramatica.IsCalculate(self)
 
@@ -388,7 +382,6 @@ class Gramatica():
         rangeStr = len(stringListed)
 
         while True:
-            #Buscar regla
             input = stringListed[0]
 
             nextNoTerminal =""
